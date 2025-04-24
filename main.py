@@ -12,19 +12,17 @@ parser.add_argument('--api', dest='api', type=str, help='Імя текстово
 parser.add_argument('--num', dest='num', type=str, help='Кількість постів в серії (за заповчуванням 7)')
 parser.add_argument('--delay', dest='delay', type=str, help='Затримка між серією постів в хвилинах (за заповчуванням 21 хвилина)')
 args = parser.parse_args()
-"""
-driver = webdriver.Firefox()
-driver.get("http://www.python.org")
-assert "Python" in driver.title
-elem = driver.find_element(By.NAME, "q")
-elem.clear()
-elem.send_keys("pycon")
-elem.send_keys(Keys.RETURN)
 
-time.sleep(10)
-assert "No results found." not in driver.page_source
-driver.close()
+def print_banner_Anjela():
+    banner = r"""
+   █████╗ ███╗   ██╗      ██╗███████╗██╗      █████╗ 
+  ██╔══██╗████╗  ██║      ██║██╔════╝██║     ██╔══██╗
+  ███████║██╔██╗ ██║      ██║█████╗  ██║     ███████║
+  ██╔══██║██║╚██╗██║██   ██║ ██╔══╝  ██║     ██╔══██║
+  ██║  ██║██║ ╚████║╚█████╔╝ ███████╗███████╗██║  ██║
+  ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚════╝  ╚══════╝╚══════╝╚═╝  ╚═╝
 """
+    print('\033[91m' + banner + '\033[0m')
 
 def get_password() -> str:
     try:
@@ -78,6 +76,7 @@ def get_delay() -> int:
 
 def main(): 
     # Ваш код тут
+    print_banner_Anjela()
     pwd = get_password()
     api_key = get_api_key()
     num = get_num()
