@@ -50,23 +50,25 @@ class Treads_Management:
         # Continue with Instagram
         elem = self.browser.find_element(By.XPATH, '//*[contains(text(), "Continue with Instagram")]')
         elem.click()
+
+        time.sleep(16)
     
         elem = self.browser.find_element(By.XPATH, "//input[@aria-label='Phone number, username, or email']")
         elem.send_keys(self.login)
-        time.sleep(2)
+        time.sleep(3)
 
         # Password
         elem = self.browser.find_element(By.XPATH, "//input[@aria-label='Password']")
         elem.send_keys(self.password)
         elem.send_keys(Keys.ENTER)
 
-        time.sleep(2)
+        time.sleep(7)
 
         elem = self.browser.find_element(By.XPATH, '//*[contains(text(), "Save info")]')
         elem.click()
 
         # Чекаємо, щоб встигло виконатися входження
-        time.sleep(7)
+        time.sleep(27)
         # Зберігаємо cookies після успішного входу
         self.save_cookies()
         #self.browser.close()
