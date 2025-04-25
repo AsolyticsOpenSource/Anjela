@@ -4,7 +4,7 @@ import traceback
 from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT
 class LLM_Wrapper:
     def __init__(self, api_key:str):
-        self.model_name = "gpt-4.1-mini"
+        self.model_name = "gpt-4o-mini"
         self.client = OpenAI(api_key=api_key)
 
     def generate_response(self, user_post: str) -> str:
