@@ -64,8 +64,11 @@ class Treads_Management:
 
         time.sleep(7)
 
-        elem = self.browser.find_element(By.XPATH, '//*[contains(text(), "Save info")]')
-        elem.click()
+        try:
+            elem = self.browser.find_element(By.XPATH, '//*[contains(text(), "Save info")]')
+            elem.click()
+        except Exception as e:
+            time.sleep(48)
 
         # Чекаємо, щоб встигло виконатися входження
         time.sleep(27)
