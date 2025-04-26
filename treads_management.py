@@ -18,10 +18,10 @@ import sys
 
 class Treads_Management: 
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str):
         self.login = login
         self.password = password
-        self.cookies_file = "cookies.json"  # Файл для збереження cookie
+        self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
         profile = webdriver.FirefoxProfile()
         profile.set_preference("intl.accept_languages", "en-US, en")
         profile.update_preferences()
@@ -30,7 +30,7 @@ class Treads_Management:
         self.browser = webdriver.Firefox(options=options)
         self.maximum_number_of_posts_in_a_row = num
         self.delay_between_posts = delay  # в секундах
-        self.llm = LLM_Wrapper(api_key)
+        self.llm = LLM_Wrapper(api_key, prompt)
         self.db = Tweets_DataBase()
 
     def start(self):
@@ -75,6 +75,7 @@ class Treads_Management:
         self.start_the_cycle()
 
     def save_cookies(self):
+        os.makedirs(os.path.dirname(self.cookies_file), exist_ok=True)
         cookies = self.browser.get_cookies()
         with open(self.cookies_file, "w") as f:
             json.dump(cookies, f)

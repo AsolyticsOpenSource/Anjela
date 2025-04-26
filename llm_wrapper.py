@@ -3,9 +3,10 @@ from openai import OpenAI
 import traceback
 from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT
 class LLM_Wrapper:
-    def __init__(self, api_key:str):
+    def __init__(self, api_key:str, prompt:str):
         self.model_name = "gpt-4o-mini"
         self.client = OpenAI(api_key=api_key)
+        self.prompt = prompt
 
     def generate_response(self, user_post: str) -> str:
         print(f"Post: {user_post}")
@@ -16,7 +17,7 @@ class LLM_Wrapper:
         try:
             response = self.client.responses.create(
                 model=self.model_name,
-                instructions=SYSTEM_PROMPT.format(language),
+                instructions= self.prompt.format(language) if self.prompt != None else SYSTEM_PROMPT.format(language),
                 input=user_post,
             )
             # completion = openai.ChatCompletion.create(

@@ -11,6 +11,7 @@ parser.add_argument('--pwd', dest='pwd', type=str, help='Імя текстово
 parser.add_argument('--api', dest='api', type=str, help='Імя текстового файлу з токеном OpenAI') 
 parser.add_argument('--num', dest='num', type=str, help='Кількість постів в серії (за заповчуванням 7)')
 parser.add_argument('--delay', dest='delay', type=str, help='Затримка між серією постів в хвилинах (за заповчуванням 21 хвилина)')
+parser.add_argument('--prompt', dest='prompt', type=str, help='Файл з конфігурацією для генерації постів, якщо не вказано, то буде використано за замовчуванням')
 args = parser.parse_args()
 
 def print_banner_Anjela():
@@ -74,6 +75,17 @@ def get_delay() -> int:
         print("Помилка: Затримка має бути цілим числом.")
     return 21 * 60  # Значення за замовчуванням (21 хвилина в секундах)
 
+def get_system_prompt() -> str:
+    try:
+        with open(args.prompt, 'r', encoding='utf-8') as file:
+            system_prompt = file.read().strip()
+            return system_prompt
+    except FileNotFoundError:
+        print("Файл з конфігурацією не знайдено. Буде використано за замовчуванням")
+    except Exception as e:
+        print(f"Промпт не задано, буде використано за замовчуванням.")
+    return None
+
 def main(): 
     # Ваш код тут
     print_banner_Anjela()
@@ -81,8 +93,9 @@ def main():
     api_key = get_api_key()
     num = get_num()
     delay = get_delay()
+    prompt = get_system_prompt()
     if args.login and pwd and api_key:  
-        tm = Treads_Management(args.login, pwd, api_key, num, delay)
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt)
         tm.start()
     else:
         print("Логін або пароль не вказані.")
