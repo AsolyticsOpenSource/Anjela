@@ -202,9 +202,14 @@ class Treads_Management:
                 button_reply = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Reply"]')
                 button_reply.click()
 
-                message = self.browser.find_element(
-                    By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+                message = WebDriverWait(self.browser, 120).until(
+                    EC.element_to_be_clickable((
+                        By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+                    ))
                 )
+                # message = self.browser.find_element(
+                #     By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+                # )
                 
                 # actions = ActionChains(self.browser)
                 # for char in text:
