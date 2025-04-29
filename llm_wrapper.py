@@ -1,10 +1,12 @@
 
 from openai import OpenAI
 import traceback
-from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT
+from db_tweets import Tweets_DataBase
+from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT
 class LLM_Wrapper:
-    def __init__(self, api_key:str, prompt:str):
+    def __init__(self, api_key:str, prompt:str = None):
         self.model_name = "gpt-4o-mini"
+        self.model_name_for_posts = "gpt-4.1-mini"
         self.client = OpenAI(api_key=api_key)
         self.prompt = prompt
 
@@ -43,3 +45,35 @@ class LLM_Wrapper:
         except:
             traceback.print_exc()
         return "English"
+
+    def generate_user_post(self, topic: str, bio: str, posts: list[str]) -> str:
+        # Формуємо історію постів у потрібному форматі
+        if not posts:
+            history = "No history yet."
+        else:
+            history = "\n\n".join(
+                ["Post " + str(i+1) + ":\n" + post.replace('\n', '') for i, post in enumerate(posts)]
+            )
+        try:
+            response = self.client.responses.create(
+                model=self.model_name_for_posts,
+                instructions=BIO_PROMPT.format(bio),
+                input=TOPIC_PROMPT.format(history, topic),
+            )
+            return self.select_top_post(response.output_text)
+        except:
+            traceback.print_exc()
+        return None
+    
+    def select_top_post(self, posts: str) -> str:
+        # Placeholder for selecting the top post
+        try:
+            response = self.client.responses.create(
+                model=self.model_name_for_posts,
+                instructions=SELECT_POST_PROMPT,
+                input=posts,
+            )
+            return response.output_text
+        except:
+            traceback.print_exc()
+        return None

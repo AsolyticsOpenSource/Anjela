@@ -12,6 +12,8 @@ parser.add_argument('--api', dest='api', type=str, help='Імя текстово
 parser.add_argument('--num', dest='num', type=str, help='Кількість постів в серії (за заповчуванням 7)')
 parser.add_argument('--delay', dest='delay', type=str, help='Затримка між серією постів в хвилинах (за заповчуванням 21 хвилина)')
 parser.add_argument('--prompt', dest='prompt', type=str, help='Файл з конфігурацією для генерації постів, якщо не вказано, то буде використано за замовчуванням')
+parser.add_argument('--freq', dest='freq', type=float, help='Частота з якою аватар буде публікувати пости в годинах (за заповчуванням 0 годин - вимкнуто)', default=0)
+parser.add_argument('--topic', dest='topic', type=str, help='Тема на яку аватар буде публікувати пости (треба вказати шлях до файлу з темою)')
 args = parser.parse_args()
 
 def print_banner_Anjela():
@@ -86,6 +88,31 @@ def get_system_prompt() -> str:
         print(f"Промпт не задано, буде використано за замовчуванням.")
     return None
 
+def get_topic() -> str:
+    try:
+        with open(args.topic, 'r', encoding='utf-8') as file:
+            topic = file.read().strip()
+            return topic
+    except FileNotFoundError:
+        print("Файл з темою не знайдено.")
+    except Exception as e:
+        print(f"Помилка при зчитуванні файлу з темою: {e}")
+    return None
+
+def get_freq() -> int:
+    try:
+        if args.freq:
+            freq = float(args.freq)
+            if freq >= 0:
+                return freq
+            else:
+                print("Частота має бути невід'ємним числом.")
+        else:
+            return 0  # Значення за замовчуванням (вимкнуто)
+    except ValueError:
+        print("Помилка: Частота має бути числом.")
+    return 0  # Значення за замовчуванням (вимкнуто)
+
 def main(): 
     # Ваш код тут
     print_banner_Anjela()
@@ -94,8 +121,10 @@ def main():
     num = get_num()
     delay = get_delay()
     prompt = get_system_prompt()
+    freq = get_freq()
+    topic = get_topic() if freq > 0 else None 
     if args.login and pwd and api_key:  
-        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt)
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic)
         tm.start()
     else:
         print("Логін або пароль не вказані.")

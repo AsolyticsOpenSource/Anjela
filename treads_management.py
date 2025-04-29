@@ -18,7 +18,7 @@ import sys
 
 class Treads_Management: 
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str):
         self.login = login
         self.password = password
         self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
@@ -32,6 +32,8 @@ class Treads_Management:
         self.delay_between_posts = delay  # в секундах
         self.llm = LLM_Wrapper(api_key, prompt)
         self.db = Tweets_DataBase()
+        self.freq = freq
+        self.topic = topic
 
     def start(self):
         self.browser.implicitly_wait(10)
@@ -111,8 +113,9 @@ class Treads_Management:
     def start_the_cycle(self):
         while True:
             try:
-                self.go_to_search()
+                # self.go_to_search()
                 self.go_to_home()
+                self.publish_post_to_the_main_page()
                 time.sleep(self.delay_between_posts)
             except Exception as e:
                 print("Error in the main loop:", e)
@@ -286,4 +289,52 @@ class Treads_Management:
                     number_of_published_comments += 1
         return True
 
+    def publish_post_to_the_main_page(self):
+        time.sleep(27)
+        
+        if self.freq == 0 or self.topic == None:
+            return
+        if not self.db.is_last_post_older_than(self.login, self.freq):
+            print("Пост нещодавно опублікований, пропускаємо...")
+            return
+        
+        bio = self.get_bio()
+        # Використання CSS-селектора для натискання на посилання з href="/search"
+        post_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[normalize-space(text())='Post']"))
+        )
+        post_button.click()
 
+        message = WebDriverWait(self.browser, 120).until(
+            EC.element_to_be_clickable((
+                By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+            ))
+        )
+
+        posts = self.db.get_only_posts(self.login)
+        
+        response =  self.llm.generate_user_post(topic=self.topic, bio=bio, posts=posts)
+
+        post_button = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
+        
+        if response:
+            pyperclip.copy(response)
+            if sys.platform == 'darwin':
+                message.send_keys(Keys.COMMAND, 'v')
+            else:
+                message.send_keys(Keys.CONTROL, 'v')
+            time.sleep(3)
+            post_button[1].click()
+            self.db.insert_user_post(self.login, response)
+
+    def get_bio(self) -> str:
+        # Отримуємо біо з бази даних
+        profile = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, f"a[href='/@{self.login}']"))
+        )
+        profile.click()
+        
+        div_bio = self.browser.find_element(By.XPATH, "//div[contains(@class, 'xw7yly9')]")
+        bio = div_bio.text
+        time.sleep(7)
+        return bio

@@ -36,3 +36,16 @@ English,
 and so on.
 
 Do not write anything else!"""
+
+BIO_PROMPT = """Here's your bio, a brief information about you: 
+{}
+
+Your writing style should match your bio.
+"""
+
+TOPIC_PROMPT = """Here is the history of your previous posts:
+{}
+
+Write me 7 posts for the Threads on this topic (take into account the posts you wrote earlier and do not repeat yourself): {}"""
+
+SELECT_POST_PROMPT = """Choose one best post for Threads out of the 7 suggested ones, check and correct errors, including those related to terminology. Write only the text of the post. Use two entries after each sentence."""
