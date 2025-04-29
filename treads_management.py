@@ -113,7 +113,7 @@ class Treads_Management:
     def start_the_cycle(self):
         while True:
             try:
-                # self.go_to_search()
+                self.go_to_search()
                 self.go_to_home()
                 self.publish_post_to_the_main_page()
                 time.sleep(self.delay_between_posts)
@@ -291,7 +291,7 @@ class Treads_Management:
 
     def publish_post_to_the_main_page(self):
         time.sleep(27)
-        
+
         if self.freq == 0 or self.topic == None:
             return
         if not self.db.is_last_post_older_than(self.login, self.freq):
