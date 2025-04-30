@@ -7,6 +7,7 @@ class LLM_Wrapper:
     def __init__(self, api_key:str, prompt:str = None):
         self.model_name = "gpt-4o-mini"
         self.model_name_for_posts = "gpt-4.1-mini"
+        self.model_name_for_scores = "o4-mini"
         self.client = OpenAI(api_key=api_key)
         self.prompt = prompt
 
@@ -69,7 +70,7 @@ class LLM_Wrapper:
         # Placeholder for selecting the top post
         try:
             response = self.client.responses.create(
-                model=self.model_name_for_posts,
+                model=self.model_name_for_scores,
                 instructions=SELECT_POST_PROMPT,
                 input=posts,
             )
