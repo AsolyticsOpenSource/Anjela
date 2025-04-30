@@ -46,6 +46,6 @@ Your writing style should match your bio.
 TOPIC_PROMPT = """Here is the history of your previous posts:
 {}
 
-Write me 7 posts for the Threads on this topic (consider the history of your previous posts to avoid repeating yourself): {}"""
+Write me 7 posts for the Threads on these topics (consider the history of your previous posts to avoid repeating yourself): {}"""
 
 SELECT_POST_PROMPT = """Choose one best post for Threads out of the 7 suggested ones, check and correct errors, including those related to terminology. Write only the text of the post. Use two entries after each sentence."""
