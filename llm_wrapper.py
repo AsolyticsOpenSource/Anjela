@@ -5,9 +5,9 @@ from db_tweets import Tweets_DataBase
 from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, OLD_AND_NEW_POSTS
 class LLM_Wrapper:
     def __init__(self, api_key:str, prompt:str = None):
-        self.model_name = "gpt-4o-mini"
-        self.model_name_for_posts = "gpt-4.1-mini"
-        self.model_name_for_scores = "o4-mini"
+        self.model_name_4o_mini = "gpt-4o-mini"
+        self.model_name_4_1_mini = "gpt-4.1-mini"
+        self.model_name_o4_mini = "o4-mini"
         self.client = OpenAI(api_key=api_key)
         self.prompt = prompt
 
@@ -19,7 +19,7 @@ class LLM_Wrapper:
         result_text = None
         try:
             response = self.client.responses.create(
-                model=self.model_name,
+                model=self.model_name_4o_mini,
                 instructions= self.prompt.format(language) if self.prompt != None else SYSTEM_PROMPT.format(language),
                 input=user_post,
             )
@@ -38,7 +38,7 @@ class LLM_Wrapper:
         # Placeholder for language detection
         try:
             response = self.client.responses.create(
-                model=self.model_name,
+                model=self.model_name_4o_mini,
                 instructions=LANGUAGE_PROMPT,
                 input=text,
             )
@@ -58,7 +58,7 @@ class LLM_Wrapper:
             )
         try:
             response = self.client.responses.create(
-                model=self.model_name_for_posts,
+                model=self.model_name_o4_mini,
                 instructions=BIO_PROMPT.format(bio),
                 input=TOPIC_PROMPT.format(history, topic),
             )
@@ -71,7 +71,7 @@ class LLM_Wrapper:
         # Placeholder for selecting the top post
         try:
             response = self.client.responses.create(
-                model=self.model_name_for_scores,
+                model=self.model_name_4_1_mini,
                 instructions=SELECT_POST_PROMPT,
                 input=OLD_AND_NEW_POSTS.format(old_posts, posts),
             )
