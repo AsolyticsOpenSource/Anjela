@@ -71,7 +71,7 @@ class LLM_Wrapper:
         # Placeholder for selecting the top post
         try:
             response = self.client.responses.create(
-                model=self.model_name_4_1_mini,
+                model=self.model_name_o4_mini,
                 instructions=SELECT_POST_PROMPT,
                 input=OLD_AND_NEW_POSTS.format(old_posts, posts),
             )
