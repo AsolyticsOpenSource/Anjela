@@ -46,7 +46,7 @@ TOPIC_PROMPT = """Here is the history of your previous posts:
 
 Write me 7 posts for the Threads on these topics (Сonsider the history of your previous posts to avoid repeating yourself. Do not repeat topics you have already written about. Do not repeat phrases you have already written about. Do not ask questions that you have already asked. Your posts should be unique and not similar to what has already been written before): {}"""
 
-SELECT_POST_PROMPT = """Тобі треба вибирати один найкращий пост для Threads із 7 запропонованих.  
+SELECT_POST_PROMPT = """Тобі треба вибирати один найкращий пост для Threads з 7 нових запропонованих, він має бути найбільши унікальним і не схожим на попередні твори.  
 
 Необхідно перевірити текст і виправити всі можливі помилки:
 – орфографічні;
@@ -58,3 +58,10 @@ SELECT_POST_PROMPT = """Тобі треба вибирати один найкр
 Напиши текст відкоригованого твору. Не пиши нічого зайвого.
 
 Після кожного речення використовуйте два переноси."""
+
+OLD_AND_NEW_POSTS = """###  Попередні твори:
+{}
+
+###  Нові твори:
+{}
+"""

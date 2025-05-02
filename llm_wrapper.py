@@ -2,7 +2,7 @@
 from openai import OpenAI
 import traceback
 from db_tweets import Tweets_DataBase
-from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT
+from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, OLD_AND_NEW_POSTS
 class LLM_Wrapper:
     def __init__(self, api_key:str, prompt:str = None):
         self.model_name = "gpt-4o-mini"
@@ -49,6 +49,7 @@ class LLM_Wrapper:
 
     def generate_user_post(self, topic: str, bio: str, posts: list[str]) -> str:
         # Формуємо історію постів у потрібному форматі
+        posts = [post for post in posts if post is not None]
         if not posts:
             history = "No history yet."
         else:
@@ -61,18 +62,18 @@ class LLM_Wrapper:
                 instructions=BIO_PROMPT.format(bio),
                 input=TOPIC_PROMPT.format(history, topic),
             )
-            return self.select_top_post(response.output_text)
+            return self.select_top_post(response.output_text, history)
         except:
             traceback.print_exc()
         return None
     
-    def select_top_post(self, posts: str) -> str:
+    def select_top_post(self, posts: str, old_posts:str) -> str:
         # Placeholder for selecting the top post
         try:
             response = self.client.responses.create(
                 model=self.model_name_for_scores,
                 instructions=SELECT_POST_PROMPT,
-                input=posts,
+                input=OLD_AND_NEW_POSTS.format(old_posts, posts),
             )
             return response.output_text
         except:
