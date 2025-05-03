@@ -10,6 +10,7 @@ import pyperclip
 from llm_wrapper import LLM_Wrapper
 from db_tweets import Tweets_DataBase
 import random
+import traceback
 
 import time
 import json
@@ -253,13 +254,14 @@ class Treads_Management:
             # Check which element was found
             if element.text == "Posted":
                 print("Post successfully published")
-            else:
+            elif element.text == "Post failed to upload":
                 print("Post failed to upload")
                 print("Досягнуто ліміт публікацій!")
-                print("Завершую роботу програми...")
-                exit()
+                print("Завершую роботу програми...\n\n")
+                self.browser.quit()
+                sys.exit()
         except:
-            print("Виникла помилка під час очікування публікації")
+            print("Виникла помилка під час очікування публікації\n\n")
 
     def view_the_post(self) -> bool:
         #x1ypdohk x1n2onr6 xvuun6i x3qs2gp x1w8tkb5 x8xoigl xz9dl7a
