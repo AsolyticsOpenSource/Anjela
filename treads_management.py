@@ -231,13 +231,36 @@ class Treads_Management:
                         message.send_keys(Keys.COMMAND, 'v')
                     else:
                         message.send_keys(Keys.CONTROL, 'v')
+                    print(f"Name: {self.login}")
                     post_button.click()
+                    self.wait_for_publication()
                     self.db.insert_tweet(url, text_post, response)
                 return True
             except Exception as e:
                 print("Error publishing post:", e)
         return False
     
+    def wait_for_publication(self):
+        try:
+            # Wait for either success or failure message
+            element = WebDriverWait(self.browser, 120).until(
+                EC.any_of(
+                    EC.element_to_be_clickable((By.XPATH, "//div[normalize-space(text())='Posted']")),
+                    EC.element_to_be_clickable((By.XPATH, "//div[normalize-space(text())='Post failed to upload']"))
+                )
+            )
+
+            # Check which element was found
+            if element.text == "Posted":
+                print("Post successfully published")
+            else:
+                print("Post failed to upload")
+                print("Досягнуто ліміт публікацій!")
+                print("Завершую роботу програми...")
+                exit()
+        except:
+            print("Виникла помилка під час очікування публікації")
+
     def view_the_post(self) -> bool:
         #x1ypdohk x1n2onr6 xvuun6i x3qs2gp x1w8tkb5 x8xoigl xz9dl7a
         elements = self.browser.find_elements(
@@ -325,6 +348,7 @@ class Treads_Management:
                 message.send_keys(Keys.CONTROL, 'v')
             time.sleep(3)
             post_button[1].click()
+            self.wait_for_publication()
             self.db.insert_user_post(self.login, response)
 
     def get_bio(self) -> str:
