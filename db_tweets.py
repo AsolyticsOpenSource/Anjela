@@ -7,6 +7,7 @@ class Tweets_DataBase:
         self.conn = sqlite3.connect("tweets.db")
         self.create_table()
         self.create_user_posts_table()
+        self.create_comments_table()
 
     def create_table(self):
         
@@ -29,6 +30,16 @@ class Tweets_DataBase:
                     publication_date TEXT,
                     login TEXT,
                     publication_text TEXT
+                )
+            ''')
+
+    def create_comments_table(self):
+        with self.conn:
+            self.conn.execute('''
+                CREATE TABLE IF NOT EXISTS comments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    login TEXT,
+                    tweet_url TEXT
                 )
             ''')
 
@@ -85,3 +96,17 @@ class Tweets_DataBase:
         except ValueError:
             return True
         return (datetime.now() - last_post_date) > timedelta(hours=hours)
+
+    def insert_comment(self, login, url):
+        with self.conn:
+            self.conn.execute('''
+                INSERT INTO comments (login, tweet_url) VALUES (?, ?)
+            ''', (login, url))
+    
+    def has_user_commented(self, login: str, tweet_url: str) -> bool:
+        cursor = self.conn.cursor()
+        cursor.execute('''
+            SELECT COUNT(*) FROM comments WHERE login = ? AND tweet_url = ?
+        ''', (login, tweet_url))
+        count = cursor.fetchone()[0]
+        return count > 0

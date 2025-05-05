@@ -14,6 +14,9 @@ parser.add_argument('--delay', dest='delay', type=str, help='Затримка м
 parser.add_argument('--prompt', dest='prompt', type=str, help='Файл з конфігурацією для генерації постів, якщо не вказано, то буде використано за замовчуванням')
 parser.add_argument('--freq', dest='freq', type=float, help='Частота з якою аватар буде публікувати пости в годинах (за заповчуванням 0 годин - вимкнуто)', default=0)
 parser.add_argument('--topic', dest='topic', type=str, help='Тема на яку аватар буде публікувати пости (треба вказати шлях до файлу з темою)')
+parser.add_argument('--surfing', dest='surfing', type=str, help='Логін користувача, чиї дописи ви хочете вподобати та прокоментувати, в стрічці')
+parser.add_argument('--sur_count', dest='sur_count', type=int, help='Скільки постів потрібно переглянути в пошуках цілі (число за замовчуванням 333)', default=333)
+parser.add_argument('--sur_prompt', dest='sur_prompt', type=str, help='Шлях до файлу де вказано ситемний промпт для коментування (якщо не вказати буде дефолтний)')
 args = parser.parse_args()
 
 def print_banner_Anjela():
@@ -113,6 +116,25 @@ def get_freq() -> int:
         print("Помилка: Частота має бути числом.")
     return 0  # Значення за замовчуванням (вимкнуто)
 
+def get_surfing() -> str:
+    return args.surfing
+
+def get_sur_count() -> int:
+    return args.sur_count
+
+def get_sur_prompt() -> str:
+    try:
+        if args.sur_prompt:
+            with open(args.sur_prompt, 'r', encoding='utf-8') as file:
+                sur_prompt = file.read().strip()
+                return sur_prompt
+        return None
+    except FileNotFoundError:
+        print("Файл з системним промптом для коментування не знайдено (surfing prompt).")
+    except Exception as e:
+        print(f"Помилка при зчитуванні файлу з промптом (surfing prompt): {e}")
+    return None
+
 def main(): 
     # Ваш код тут
     print_banner_Anjela()
@@ -123,8 +145,12 @@ def main():
     prompt = get_system_prompt()
     freq = get_freq()
     topic = get_topic() if freq > 0 else None 
+    surfing = get_surfing()
+    surfing_sys_prompt = get_sur_prompt() if surfing else None
+    surfing_count = get_sur_count()
+
     if args.login and pwd and api_key:  
-        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic)
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count)
         tm.start()
     else:
         print("Логін або пароль не вказані.")

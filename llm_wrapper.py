@@ -2,7 +2,7 @@
 from openai import OpenAI
 import traceback
 from db_tweets import Tweets_DataBase
-from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, OLD_AND_NEW_POSTS
+from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, OLD_AND_NEW_POSTS, SYSTEM_PROMPT_SHORT_REPLY
 class LLM_Wrapper:
     def __init__(self, api_key:str, prompt:str = None):
         self.model_name_4o_mini = "gpt-4o-mini"
@@ -74,6 +74,18 @@ class LLM_Wrapper:
                 model=self.model_name_o4_mini,
                 instructions=SELECT_POST_PROMPT,
                 input=OLD_AND_NEW_POSTS.format(old_posts, posts),
+            )
+            return response.output_text
+        except:
+            traceback.print_exc()
+        return None
+    
+    def short_reply(self, text_post:str, sys_prompt:str):
+        try:
+            response = self.client.responses.create(
+                model=self.model_name_4_1_mini,
+                instructions=sys_prompt if sys_prompt else SYSTEM_PROMPT_SHORT_REPLY,
+                input=text_post,
             )
             return response.output_text
         except:

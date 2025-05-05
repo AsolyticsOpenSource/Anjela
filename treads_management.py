@@ -19,7 +19,7 @@ import sys
 
 class Treads_Management: 
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str, surfing:str, surfing_sys_prompt:str, surfing_count:int):
         self.login = login
         self.password = password
         self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
@@ -35,6 +35,9 @@ class Treads_Management:
         self.db = Tweets_DataBase()
         self.freq = freq
         self.topic = topic
+        self.surfing_login = surfing
+        self.surfing_sys_prompt = surfing_sys_prompt
+        self.surfing_count = surfing_count
 
     def start(self):
         self.browser.implicitly_wait(10)
@@ -117,6 +120,7 @@ class Treads_Management:
                 self.go_to_search()
                 self.go_to_home()
                 self.publish_post_to_the_main_page()
+                self.surfing_the_news_feed()
                 time.sleep(self.delay_between_posts)
             except Exception as e:
                 print("Error in the main loop:", e)
@@ -142,7 +146,6 @@ class Treads_Management:
                 ']'
         )
         return post_text
-    
 
     def content_overview(self):
         search_field = self.browser.find_element(By.XPATH, "//input[@placeholder='Search']")
@@ -352,6 +355,7 @@ class Treads_Management:
             post_button[1].click()
             self.wait_for_publication()
             self.db.insert_user_post(self.login, response)
+        self.go_to_home()
 
     def get_bio(self) -> str:
         # Отримуємо біо з бази даних
@@ -364,3 +368,134 @@ class Treads_Management:
         bio = div_bio.text
         time.sleep(7)
         return bio
+
+    def surfing_the_news_feed(self):
+        # Process news feed by scrolling each element into view individually
+        if not self.surfing_login:
+            return
+
+        scroll_pause = 3
+        processed_elements = 0
+        elements_processed_since_last_check = 0
+        max_elements_without_scroll = self.surfing_count
+        
+        while True:
+            # Get current elements
+            elements = self.browser.find_elements(
+                By.XPATH,
+                '//div['
+                'contains(@class, "x1ypdohk") and '
+                'contains(@class, "x1n2onr6") and '
+                'contains(@class, "xvuun6i") and '
+                'contains(@class, "x3qs2gp") and '
+                'contains(@class, "x1w8tkb5") and '
+                'contains(@class, "x8xoigl") and '
+                'contains(@class, "xz9dl7a")'
+                ']'
+            )
+            
+            # Process each element by scrolling it into view
+            for i, element in enumerate(elements):
+                if i < processed_elements:
+                    continue  # Skip already processed elements
+                
+                # Scroll element into view (top of viewport)
+                self.browser.execute_script(
+                    "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'start' });", 
+                    element
+                )
+                
+                # Wait for any dynamic content to load
+                time.sleep(scroll_pause)
+
+                if self.author_check(post=element, previous=elements[i-1] if i > 0 else None):
+                    return True
+                
+                # Check if we need to break due to element limit
+                elements_processed_since_last_check += 1
+                if elements_processed_since_last_check >= max_elements_without_scroll:
+                    print("Checking for new content after scrolling multiple elements")
+                    elements_processed_since_last_check = 0
+                    break
+                
+                processed_elements += 1
+                
+                # Optional: limit maximum number of elements to process
+                if processed_elements > 100:  # Adjust based on needs
+                    print("Reached maximum number of elements to process")
+                    return True
+                    
+            # If no new elements were processed in this iteration
+            if elements_processed_since_last_check == 0:
+                print("No new elements found after scrolling")
+                return True
+                
+            elements_processed_since_last_check = 0
+            time.sleep(scroll_pause)
+            
+        return True
+    
+    def author_check(self, post:WebElement, previous:WebElement) -> bool:
+        if previous:
+            #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
+            element_line = previous.find_elements(
+                By.XPATH,
+                './/div['
+                'contains(@class, "x1vf43f7") and '
+                'contains(@class, "xm3z3ea") and '
+                'contains(@class, "x1x8b98j") and '
+                'contains(@class, "x131883w") and '
+                'contains(@class, "x16mih1h") and '
+                'contains(@class, "x5yr21d") and '
+                'contains(@class, "x10l6tqk") and '
+                'contains(@class, "xfo62xy")'
+                ']'
+            )
+            if len(element_line) > 0: return False
+
+        url = self.get_post_href(post)
+
+        if (not self.db.has_user_commented(login=self.login, tweet_url=url)) and (url.__contains__(f"/@{self.surfing_login}/")):
+            time.sleep(11)
+            self.like_and_reply(post=post, url=url)
+            return True
+        return False
+
+    def like_and_reply(self, post:WebElement, url):
+        post_text = self.get_text_post(post).text
+        if post_text.endswith("Translate"):
+            post_text = post_text[:-len("Translate")].strip()
+
+        button_like = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Like"]')
+        button_like.click()
+
+        time.sleep(5)
+
+        button_reply = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Reply"]')
+        button_reply.click()
+
+        message = WebDriverWait(self.browser, 120).until(
+            EC.element_to_be_clickable((
+                By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+            ))
+        )
+
+        response = self.llm.short_reply(text_post=post_text, sys_prompt=self.surfing_sys_prompt)
+
+        if response: 
+            pyperclip.copy(response)
+            if sys.platform == 'darwin':
+                message.send_keys(Keys.COMMAND, 'v')
+            else:
+                message.send_keys(Keys.CONTROL, 'v')
+            time.sleep(3)
+            
+            post_buttons = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
+            if len(post_buttons) > 1:
+                post_buttons[1].click()
+            else:
+                post_buttons[0].click()
+
+            self.wait_for_publication()
+            self.db.insert_comment(login=self.login, url=url)
+        pass
