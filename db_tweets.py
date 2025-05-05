@@ -74,7 +74,7 @@ class Tweets_DataBase:
             FROM user_posts
             WHERE login = ?
             ORDER BY publication_date DESC
-            LIMIT 14
+            LIMIT 7
         ''', (login,))
         rows = cursor.fetchall()
         return [row[0] for row in rows]
