@@ -8,6 +8,7 @@ class LLM_Wrapper:
         self.model_name_4o_mini = "gpt-4o-mini"
         self.model_name_4_1_mini = "gpt-4.1-mini"
         self.model_name_o4_mini = "o4-mini"
+        self.model_name_4_1 = "gpt-4.1"
         self.client = OpenAI(api_key=api_key)
         self.prompt = prompt
 
@@ -58,7 +59,7 @@ class LLM_Wrapper:
             )
         try:
             response = self.client.responses.create(
-                model=self.model_name_o4_mini,
+                model=self.model_name_4_1,
                 instructions=BIO_PROMPT.format(bio),
                 input=TOPIC_PROMPT.format(history, topic),
             )
