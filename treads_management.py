@@ -471,31 +471,37 @@ class Treads_Management:
 
         time.sleep(5)
 
-        button_reply = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Reply"]')
-        button_reply.click()
+        if self.to_write_comment():
+            button_reply = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Reply"]')
+            button_reply.click()
 
-        message = WebDriverWait(self.browser, 120).until(
-            EC.element_to_be_clickable((
-                By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
-            ))
-        )
+            message = WebDriverWait(self.browser, 120).until(
+                EC.element_to_be_clickable((
+                    By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
+                ))
+            )
 
-        response = self.llm.short_reply(text_post=post_text, sys_prompt=self.surfing_sys_prompt)
+            response = self.llm.short_reply(text_post=post_text, sys_prompt=self.surfing_sys_prompt)
 
-        if response: 
-            pyperclip.copy(response)
-            if sys.platform == 'darwin':
-                message.send_keys(Keys.COMMAND, 'v')
-            else:
-                message.send_keys(Keys.CONTROL, 'v')
-            time.sleep(3)
-            
-            post_buttons = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
-            if len(post_buttons) > 1:
-                post_buttons[1].click()
-            else:
-                post_buttons[0].click()
+            if response: 
+                pyperclip.copy(response)
+                if sys.platform == 'darwin':
+                    message.send_keys(Keys.COMMAND, 'v')
+                else:
+                    message.send_keys(Keys.CONTROL, 'v')
+                time.sleep(3)
+                
+                post_buttons = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
+                if len(post_buttons) > 1:
+                    post_buttons[1].click()
+                else:
+                    post_buttons[0].click()
 
-            self.wait_for_publication()
+                self.wait_for_publication()
+                self.db.insert_comment(login=self.login, url=url)
+        else:
             self.db.insert_comment(login=self.login, url=url)
         pass
+
+    def to_write_comment(self) -> bool:
+        return random.random() < 0.5
