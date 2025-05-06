@@ -504,4 +504,4 @@ class Treads_Management:
         pass
 
     def to_write_comment(self) -> bool:
-        return random.random() < 0.8
+        return random.random() < 0.9
