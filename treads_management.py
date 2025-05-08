@@ -19,7 +19,7 @@ import sys
 
 class Treads_Management: 
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str, surfing:str, surfing_sys_prompt:str, surfing_count:int):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str, surfing:str, surfing_sys_prompt:str, surfing_count:int, feed_keywords:list[str], kt):
         self.login = login
         self.password = password
         self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
@@ -38,6 +38,8 @@ class Treads_Management:
         self.surfing_login = surfing
         self.surfing_sys_prompt = surfing_sys_prompt
         self.surfing_count = surfing_count
+        self.feed_keywords = feed_keywords
+        self.kt = kt
 
     def start(self):
         self.browser.implicitly_wait(10)
@@ -371,7 +373,7 @@ class Treads_Management:
 
     def surfing_the_news_feed(self):
         # Process news feed by scrolling each element into view individually
-        if not self.surfing_login:
+        if not self.surfing_login and not self.feed_keywords:
             return
 
         scroll_pause = 3
@@ -408,8 +410,11 @@ class Treads_Management:
                 # Wait for any dynamic content to load
                 time.sleep(scroll_pause)
 
-                if self.author_check(post=element, previous=elements[i-1] if i > 0 else None):
-                    return True
+                if self.surfing_login:
+                    self.author_check(post=element, previous=elements[i-1] if i > 0 else None)
+                
+                if self.feed_keywords:
+                    self.keywords_check(post=element, previous=elements[i-1] if i > 0 else None)
                 
                 # Check if we need to break due to element limit
                 elements_processed_since_last_check += 1
@@ -457,14 +462,14 @@ class Treads_Management:
 
         if (not self.db.has_user_commented(login=self.login, tweet_url=url)) and (url.__contains__(f"/@{self.surfing_login}/")):
             time.sleep(11)
-            self.like_and_reply(post=post, url=url)
+            post_text = self.get_text_post(post).text
+            if post_text.endswith("Translate"):
+                post_text = post_text[:-len("Translate")].strip()
+            self.like_and_reply(post=post, url=url, post_text=post_text, sys_prompt=self.surfing_sys_prompt)
             return True
         return False
 
-    def like_and_reply(self, post:WebElement, url):
-        post_text = self.get_text_post(post).text
-        if post_text.endswith("Translate"):
-            post_text = post_text[:-len("Translate")].strip()
+    def like_and_reply(self, post:WebElement, url:str, post_text:str, sys_prompt:str):
 
         button_like = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Like"]')
         button_like.click()
@@ -481,7 +486,7 @@ class Treads_Management:
                 ))
             )
 
-            response = self.llm.short_reply(text_post=post_text, sys_prompt=self.surfing_sys_prompt)
+            response = self.llm.short_reply(text_post=post_text, sys_prompt=sys_prompt)
 
             if response: 
                 pyperclip.copy(response)
@@ -505,3 +510,43 @@ class Treads_Management:
 
     def to_write_comment(self) -> bool:
         return random.random() < 0.9
+    
+    def keywords_check(self, post:WebElement, previous:WebElement) -> bool:
+        if previous:
+            #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
+            element_line = previous.find_elements(
+                By.XPATH,
+                './/div['
+                'contains(@class, "x1vf43f7") and '
+                'contains(@class, "xm3z3ea") and '
+                'contains(@class, "x1x8b98j") and '
+                'contains(@class, "x131883w") and '
+                'contains(@class, "x16mih1h") and '
+                'contains(@class, "x5yr21d") and '
+                'contains(@class, "x10l6tqk") and '
+                'contains(@class, "xfo62xy")'
+                ']'
+            )
+            if len(element_line) > 0: return False
+
+        url = self.get_post_href(post)
+
+        post_text = self.get_text_post(post).text
+        if post_text.endswith("Translate"):
+            post_text = post_text[:-len("Translate")].strip()
+
+        if (not self.db.has_user_commented(login=self.login, tweet_url=url)) and (self.check_keywords_in_post(post_text)):
+            time.sleep(11)
+            sp = self.llm.prompt if self.kt else self.surfing_sys_prompt
+            self.like_and_reply(post=post, url=url, post_text=post_text, sys_prompt=sp)
+            return True
+        return False
+    
+    def check_keywords_in_post(self, post_text: str) -> bool:
+        #Check if post_text contains any keyword from feed_keywords (case-insensitive)
+        for keyword in self.feed_keywords:
+            if keyword.lower() in post_text.lower():
+                print(f"keyword: {keyword}")
+                return True
+        return False
+

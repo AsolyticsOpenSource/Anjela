@@ -17,6 +17,8 @@ parser.add_argument('--topic', dest='topic', type=str, help='Тема на як�
 parser.add_argument('--surfing', dest='surfing', type=str, help='Логін користувача, чиї дописи ви хочете вподобати та прокоментувати, в стрічці')
 parser.add_argument('--sur_count', dest='sur_count', type=int, help='Скільки постів потрібно переглянути в пошуках цілі (число за замовчуванням 333)', default=333)
 parser.add_argument('--sur_prompt', dest='sur_prompt', type=str, help='Шлях до файлу де вказано ситемний промпт для коментування (якщо не вказати буде дефолтний)')
+parser.add_argument('--feed_keywords', dest='feed_keywords', type=str, help='Шлях до файлу з ключовими словами, ці ключові слова будуть використовуватись для пошуку постів для коментування в стрічці новин')
+parser.add_argument('--kt', dest='kt', action='store_true', help='Для коментарів по ключовим словам в стрічці використовувати файл prompt, за замовчуванням використовується sur_prompt')
 args = parser.parse_args()
 
 def print_banner_Anjela():
@@ -135,6 +137,19 @@ def get_sur_prompt() -> str:
         print(f"Помилка при зчитуванні файлу з промптом (surfing prompt): {e}")
     return None
 
+def get_feed_keywords() -> list[str]:
+    if not args.feed_keywords:
+        return []
+    try:
+        with open(args.feed_keywords, 'r', encoding='utf-8') as file:
+            keywords = [line.strip() for line in file if line.strip()]
+            return keywords
+    except FileNotFoundError:
+        print("Файл з ключовими словами не знайдено.")
+    except Exception as e:
+        print(f"Помилка при зчитуванні файлу з ключовими словами: {e}")
+    return []
+
 def main(): 
     # Ваш код тут
     print_banner_Anjela()
@@ -146,11 +161,12 @@ def main():
     freq = get_freq()
     topic = get_topic() if freq > 0 else None 
     surfing = get_surfing()
-    surfing_sys_prompt = get_sur_prompt() if surfing else None
+    surfing_sys_prompt = get_sur_prompt()
     surfing_count = get_sur_count()
+    feed_keywords = get_feed_keywords()
 
     if args.login and pwd and api_key:  
-        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count)
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count, feed_keywords, args.kt)
         tm.start()
     else:
         print("Логін або пароль не вказані.")
