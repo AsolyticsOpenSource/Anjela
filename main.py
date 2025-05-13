@@ -142,7 +142,7 @@ def get_feed_keywords() -> list[str]:
         return []
     try:
         with open(args.feed_keywords, 'r', encoding='utf-8') as file:
-            keywords = [line.strip() for line in file if line.strip()]
+            keywords = [line.strip().replace('+', " ") for line in file if line.strip()]
             return keywords
     except FileNotFoundError:
         print("Файл з ключовими словами не знайдено.")
@@ -173,3 +173,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
