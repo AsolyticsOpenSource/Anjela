@@ -252,7 +252,7 @@ class Treads_Management:
                             ))
                         )
                     
-                    if btns:
+                    if len(btns) > 1:
                         btns[-1].click()
                         self.wait_for_publication()
                         self.db.insert_tweet(url, text_post, response)
