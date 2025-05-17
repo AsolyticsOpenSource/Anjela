@@ -228,7 +228,7 @@ class Treads_Management:
                 
                 time.sleep(1)
                 
-                post_button = self.browser.find_element(By.XPATH, "//div[normalize-space(text())='Post']")
+                
                 # post_button.click()
                 response = self.llm.generate_response(text_post)
                 if response:
@@ -238,9 +238,29 @@ class Treads_Management:
                     else:
                         message.send_keys(Keys.CONTROL, 'v')
                     print(f"Name: {self.login}")
-                    post_button.click()
-                    self.wait_for_publication()
-                    self.db.insert_tweet(url, text_post, response)
+                    time.sleep(3)
+
+                    btns = WebDriverWait(self.browser, 5).until(
+                            EC.presence_of_all_elements_located((
+                                By.XPATH,
+                                './/span['
+                                'contains(@class, "x1rg5ohu") and '
+                                'contains(@class, "x1f5funs") and '
+                                'contains(@class, "x1uosm7l") and '
+                                'contains(@class, "x1bl4301")'
+                                ']'
+                            ))
+                        )
+                    
+                    if btns:
+                        btns[-1].click()
+                        self.wait_for_publication()
+                        self.db.insert_tweet(url, text_post, response)
+                    else:
+                        post_button = self.browser.find_element(By.XPATH, "//div[normalize-space(text())='Post']")
+                        post_button.click()
+                        self.wait_for_publication()
+                        self.db.insert_tweet(url, text_post, response)
                 return True
             except Exception as e:
                 print("Error publishing post:", e)
@@ -494,16 +514,38 @@ class Treads_Management:
                     message.send_keys(Keys.COMMAND, 'v')
                 else:
                     message.send_keys(Keys.CONTROL, 'v')
-                time.sleep(3)
-                
-                post_buttons = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
-                if len(post_buttons) > 1:
-                    post_buttons[1].click()
-                else:
-                    post_buttons[0].click()
+                time.sleep(5)
 
-                self.wait_for_publication()
-                self.db.insert_comment(login=self.login, url=url)
+                # x1rg5ohu x1f5funs x1uosm7l x1bl4301
+
+                try:
+                    elements = WebDriverWait(self.browser, 5).until(
+                        EC.presence_of_all_elements_located((
+                            By.XPATH,
+                            './/span['
+                            'contains(@class, "x1rg5ohu") and '
+                            'contains(@class, "x1f5funs") and '
+                            'contains(@class, "x1uosm7l") and '
+                            'contains(@class, "x1bl4301")'
+                            ']'
+                        ))
+                    )
+                    if elements:
+                        btn_reply = elements[-1]
+                        btn_reply.click()
+                    else:
+                        raise Exception("No reply buttons found")
+                    self.wait_for_publication()
+                    self.db.insert_comment(login=self.login, url=url)
+                except:
+                    post_buttons = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
+                    if len(post_buttons) > 1:
+                        post_buttons[1].click()
+                    else:
+                        post_buttons[0].click()
+
+                    self.wait_for_publication()
+                    self.db.insert_comment(login=self.login, url=url)
         else:
             self.db.insert_comment(login=self.login, url=url)
         pass
@@ -549,4 +591,3 @@ class Treads_Management:
                 print(f"keyword: {keyword}")
                 return True
         return False
-
