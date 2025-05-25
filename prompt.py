@@ -35,7 +35,7 @@ and so on.
 
 Do not write anything else!"""
 
-BIO_PROMPT = """Here's your bio, a brief information about you: 
+BIO_PROMPT = """Here's your bio, a brief information about you:
 {}
 
 Your writing style should match your bio.
@@ -48,7 +48,7 @@ Write me 7 posts for the Threads on these topics (Сonsider the history of your 
 
 Don't write anything unnecessary"""
 
-SELECT_POST_PROMPT = """Тобі треба вибирати один найкращий пост для Threads з 7 запропонованих, він має бути унікальним і не схожим на попередні твори.  
+SELECT_POST_PROMPT = """Тобі треба вибирати один найкращий, нійцікавіший, найдотепніший пост для Threads з 7 запропонованих
 
 Необхідно перевірити текст і виправити всі можливі помилки:
 – орфографічні;
@@ -57,14 +57,11 @@ SELECT_POST_PROMPT = """Тобі треба вибирати один найкр
 – граматичні;
 – стилістичні.
 
-Напиши текст відкоригованого твору. Не пиши нічого зайвого.
+Напиши тільки текст твору. Не пиши нічого зайвого.
 
 Після кожного речення використовуйте два переноси."""
 
-OLD_AND_NEW_POSTS = """###  Попередні твори:
-{}
-
-### 7 нових творів:
+NEW_POSTS = """### 7 нових творів:
 {}
 """
 
