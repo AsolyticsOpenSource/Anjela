@@ -8,7 +8,7 @@ from treads_management import Treads_Management
 parser = argparse.ArgumentParser()
 parser.add_argument('--login', dest='login', type=str, help='Логін аккаунту соціальної мережі')
 parser.add_argument('--pwd', dest='pwd', type=str, help='Імя текстового файлу з паролем')
-parser.add_argument('--api', dest='api', type=str, help='Імя текстового файлу з токеном OpenAI') 
+parser.add_argument('--api', dest='api', type=str, help='Імя текстового файлу з токеном OpenAI')
 parser.add_argument('--num', dest='num', type=str, help='Кількість постів в серії (за заповчуванням 7)')
 parser.add_argument('--delay', dest='delay', type=str, help='Затримка між серією постів в хвилинах (за заповчуванням 21 хвилина)')
 parser.add_argument('--prompt', dest='prompt', type=str, help='Файл з конфігурацією для генерації постів, якщо не вказано, то буде використано за замовчуванням')
@@ -19,11 +19,12 @@ parser.add_argument('--sur_count', dest='sur_count', type=int, help='Скіль�
 parser.add_argument('--sur_prompt', dest='sur_prompt', type=str, help='Шлях до файлу де вказано ситемний промпт для коментування (якщо не вказати буде дефолтний)')
 parser.add_argument('--feed_keywords', dest='feed_keywords', type=str, help='Шлях до файлу з ключовими словами, ці ключові слова будуть використовуватись для пошуку постів для коментування в стрічці новин')
 parser.add_argument('--kt', dest='kt', action='store_true', help='Для коментарів по ключовим словам в стрічці використовувати файл prompt, за замовчуванням використовується sur_prompt')
+parser.add_argument('--keywords', dest='keywords', type=str, help='Шлях до файлу з ключовими словами, ці ключові слова будуть використовуватись для пошуку постів для коментування в ситемі пошуку соціальної мережі')
 args = parser.parse_args()
 
 def print_banner_Anjela():
     banner = r"""
-   █████╗ ███╗   ██╗      ██╗███████╗██╗      █████╗ 
+   █████╗ ███╗   ██╗      ██╗███████╗██╗      █████╗
   ██╔══██╗████╗  ██║      ██║██╔════╝██║     ██╔══██╗
   ███████║██╔██╗ ██║      ██║█████╗  ██║     ███████║
   ██╔══██║██║╚██╗██║██   ██║ ██╔══╝  ██║     ██╔══██║
@@ -150,7 +151,20 @@ def get_feed_keywords() -> list[str]:
         print(f"Помилка при зчитуванні файлу з ключовими словами: {e}")
     return []
 
-def main(): 
+def get_keywords() -> list[str]:
+    if not args.keywords:
+        return []
+    try:
+        with open(args.keywords, 'r', encoding='utf-8') as file:
+            keywords = [line.strip() for line in file if line.strip()]
+            return keywords
+    except FileNotFoundError:
+        print("Файл з ключовими словами для пошуку не знайдено.")
+    except Exception as e:
+        print(f"Помилка при зчитуванні файлу з ключовими словами для пошуку: {e}")
+    return []
+
+def main():
     # Ваш код тут
     print_banner_Anjela()
     pwd = get_password()
@@ -164,13 +178,13 @@ def main():
     surfing_sys_prompt = get_sur_prompt()
     surfing_count = get_sur_count()
     feed_keywords = get_feed_keywords()
+    keywords = get_keywords()
 
-    if args.login and pwd and api_key:  
-        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count, feed_keywords, args.kt)
+    if args.login and pwd and api_key:
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count, feed_keywords, args.kt, keywords)
         tm.start()
     else:
         print("Логін або пароль не вказані.")
 
 if __name__ == "__main__":
     main()
-    

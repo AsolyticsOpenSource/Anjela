@@ -82,7 +82,7 @@ class LLM_Wrapper:
             traceback.print_exc()
         return None
 
-    def short_reply(self, text_post:str, sys_prompt:str):
+    def short_reply(self, text_post:str, sys_prompt:str | None):
         try:
             response = self.client.responses.create(
                 model=self.model_name_4_1_mini,

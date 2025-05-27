@@ -17,9 +17,9 @@ import json
 import os
 import sys
 
-class Treads_Management: 
+class Treads_Management:
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str, surfing:str, surfing_sys_prompt:str, surfing_count:int, feed_keywords:list[str], kt):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str | None, surfing:str, surfing_sys_prompt:str, surfing_count:int, feed_keywords:list[str], kt, custom_keywords:list[str]):
         self.login = login
         self.password = password
         self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
@@ -40,6 +40,7 @@ class Treads_Management:
         self.surfing_count = surfing_count
         self.feed_keywords = feed_keywords
         self.kt = kt
+        self.keywords = custom_keywords
 
     def start(self):
         self.browser.implicitly_wait(10)
@@ -47,7 +48,7 @@ class Treads_Management:
         # Якщо файл з cookies існує - завантажуємо їх
         self.restore_session_cookies()
 
-    def login_to_social_network(self): 
+    def login_to_social_network(self):
         # Allow the use of cookies from Threads by Instagram on this browser?
         try:
             elem = self.browser.find_element(By.XPATH, '//div[text()="Decline optional cookies"]')
@@ -60,7 +61,7 @@ class Treads_Management:
         elem.click()
 
         time.sleep(16)
-    
+
         elem = self.browser.find_element(By.XPATH, "//input[@aria-label='Phone number, username, or email']")
         elem.send_keys(self.login)
         time.sleep(3)
@@ -133,7 +134,7 @@ class Treads_Management:
     def go_to_home(self):
         self.browser.get("https://www.threads.net")
 
-    def get_text_post(self, element) -> WebElement: 
+    def get_text_post(self, element) -> WebElement:
         # x1a6qonq x6ikm8r x10wlt62 xj0a0fe x126k92a x6prxxf x7r5mf7
         post_text = element.find_element(
              By.XPATH,
@@ -151,7 +152,8 @@ class Treads_Management:
 
     def content_overview(self):
         search_field = self.browser.find_element(By.XPATH, "//input[@placeholder='Search']")
-        search_field.send_keys(random.choice(keywords))
+        keyword = random.choice(self.keywords) if self.keywords else random.choice(keywords)
+        search_field.send_keys(keyword)
         search_field.send_keys(Keys.ENTER)
 
         time.sleep(5)
@@ -219,16 +221,16 @@ class Treads_Management:
                 # message = self.browser.find_element(
                 #     By.CSS_SELECTOR, 'div[aria-label="Empty text field. Type to compose a new post."]'
                 # )
-                
+
                 # actions = ActionChains(self.browser)
                 # for char in text:
                 #     actions.send_keys(char)
                 #     time.sleep(0.1)  # невелика затримка між символами
                 # actions.perform()
-                
+
                 time.sleep(1)
-                
-                
+
+
                 # post_button.click()
                 response = self.llm.generate_response(text_post)
                 if response:
@@ -251,7 +253,7 @@ class Treads_Management:
                                 ']'
                             ))
                         )
-                    
+
                     if len(btns) > 1:
                         btns[-1].click()
                         self.wait_for_publication()
@@ -265,7 +267,7 @@ class Treads_Management:
             except Exception as e:
                 print("Error publishing post:", e)
         return False
-    
+
     def wait_for_publication(self):
         try:
             # Wait for either success or failure message
@@ -318,7 +320,7 @@ class Treads_Management:
                 'contains(@class, "xfo62xy")'
                 ']'
             )
-            
+
             if len(line) == 0:
                 time.sleep(7)
                 post_text = self.get_text_post(element)
@@ -328,12 +330,12 @@ class Treads_Management:
                     text = text[:-len("Translate")].strip()
 
                 if number_of_published_comments >= self.maximum_number_of_posts_in_a_row:
-                    return False  
-                
+                    return False
+
                 self.browser.execute_script(
                     "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'start' });", element
                 )
-                    
+
                 is_publish = self.publish_post(element, text, url)
                 if is_publish:
                     number_of_published_comments += 1
@@ -347,7 +349,7 @@ class Treads_Management:
         if not self.db.is_last_post_older_than(self.login, self.freq):
             print("Пост нещодавно опублікований, пропускаємо...")
             return
-        
+
         bio = self.get_bio()
         # Використання CSS-селектора для натискання на посилання з href="/search"
         post_button = WebDriverWait(self.browser, 10).until(
@@ -362,11 +364,11 @@ class Treads_Management:
         )
 
         posts = self.db.get_only_posts(self.login)
-        
+
         response =  self.llm.generate_user_post(topic=self.topic, bio=bio, posts=posts)
 
         post_button = self.browser.find_elements(By.XPATH, "//div[normalize-space(text())='Post']")
-        
+
         if response:
             pyperclip.copy(response)
             if sys.platform == 'darwin':
@@ -385,7 +387,7 @@ class Treads_Management:
             EC.element_to_be_clickable((By.CSS_SELECTOR, f"a[href='/@{self.login}']"))
         )
         profile.click()
-        
+
         div_bio = self.browser.find_element(By.XPATH, "//div[contains(@class, 'xw7yly9')]")
         bio = div_bio.text
         time.sleep(7)
@@ -400,7 +402,7 @@ class Treads_Management:
         processed_elements = 0
         elements_processed_since_last_check = 0
         max_elements_without_scroll = self.surfing_count
-        
+
         while True:
             # Get current elements
             elements = self.browser.find_elements(
@@ -415,52 +417,52 @@ class Treads_Management:
                 'contains(@class, "xz9dl7a")'
                 ']'
             )
-            
+
             # Process each element by scrolling it into view
             for i, element in enumerate(elements):
                 if i < processed_elements:
                     continue  # Skip already processed elements
-                
+
                 # Scroll element into view (top of viewport)
                 self.browser.execute_script(
-                    "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'start' });", 
+                    "arguments[0].scrollIntoView({ behavior: 'smooth', block: 'start' });",
                     element
                 )
-                
+
                 # Wait for any dynamic content to load
                 time.sleep(scroll_pause)
 
                 if self.surfing_login:
                     self.author_check(post=element, previous=elements[i-1] if i > 0 else None)
-                
+
                 if self.feed_keywords:
                     self.keywords_check(post=element, previous=elements[i-1] if i > 0 else None)
-                
+
                 # Check if we need to break due to element limit
                 elements_processed_since_last_check += 1
                 if elements_processed_since_last_check >= max_elements_without_scroll:
                     print("Checking for new content after scrolling multiple elements")
                     elements_processed_since_last_check = 0
                     break
-                
+
                 processed_elements += 1
-                
+
                 # Optional: limit maximum number of elements to process
                 if processed_elements > 100:  # Adjust based on needs
                     print("Reached maximum number of elements to process")
                     return True
-                    
+
             # If no new elements were processed in this iteration
             if elements_processed_since_last_check == 0:
                 print("No new elements found after scrolling")
                 return True
-                
+
             elements_processed_since_last_check = 0
             time.sleep(scroll_pause)
-            
+
         return True
-    
-    def author_check(self, post:WebElement, previous:WebElement) -> bool:
+
+    def author_check(self, post:WebElement, previous:WebElement | None) -> bool:
         if previous:
             #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
             element_line = previous.find_elements(
@@ -489,7 +491,7 @@ class Treads_Management:
             return True
         return False
 
-    def like_and_reply(self, post:WebElement, url:str, post_text:str, sys_prompt:str):
+    def like_and_reply(self, post:WebElement, url:str, post_text:str, sys_prompt:str | None):
 
         button_like = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Like"]')
         button_like.click()
@@ -508,7 +510,7 @@ class Treads_Management:
 
             response = self.llm.short_reply(text_post=post_text, sys_prompt=sys_prompt)
 
-            if response: 
+            if response:
                 pyperclip.copy(response)
                 if sys.platform == 'darwin':
                     message.send_keys(Keys.COMMAND, 'v')
@@ -552,8 +554,8 @@ class Treads_Management:
 
     def to_write_comment(self) -> bool:
         return random.random() < 0.9
-    
-    def keywords_check(self, post:WebElement, previous:WebElement) -> bool:
+
+    def keywords_check(self, post:WebElement, previous:WebElement | None) -> bool:
         if previous:
             #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
             element_line = previous.find_elements(
@@ -583,7 +585,7 @@ class Treads_Management:
             self.like_and_reply(post=post, url=url, post_text=post_text, sys_prompt=sp)
             return True
         return False
-    
+
     def check_keywords_in_post(self, post_text: str) -> bool:
         #Check if post_text contains any keyword from feed_keywords (case-insensitive)
         for keyword in self.feed_keywords:
