@@ -64,6 +64,7 @@ class LLM_Wrapper:
                 model=self.model_name_4_1,
                 instructions=BIO_PROMPT.format(bio),
                 input=TOPIC_PROMPT.format(history, topic),
+                temperature=0.8
             )
             return self.select_top_post(response.output_text)
         except:
