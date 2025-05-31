@@ -24,7 +24,7 @@ class LLM_Wrapper:
                 model=self.model_name_4o_mini,
                 instructions= self.prompt.format(language) if self.prompt != None else SYSTEM_PROMPT.format(language),
                 input=user_post,
-                temperature=0.8,
+                temperature=2.0,
             )
             # completion = openai.ChatCompletion.create(
             #     model = self.model_name,
@@ -64,7 +64,7 @@ class LLM_Wrapper:
                 model=self.model_name_4_1,
                 instructions=BIO_PROMPT.format(bio),
                 input=TOPIC_PROMPT.format(history, topic),
-                temperature=0.8
+                temperature=2.0
             )
             return self.select_top_post(response.output_text)
         except:
@@ -90,7 +90,7 @@ class LLM_Wrapper:
                 model=self.model_name_4_1_mini,
                 instructions=sys_prompt if sys_prompt else SYSTEM_PROMPT_SHORT_REPLY,
                 input=text_post,
-                temperature=0.8,
+                temperature=2.0,
             )
             return response.output_text
         except:
