@@ -24,7 +24,7 @@ class LLM_Wrapper:
                 model=self.model_name_4o_mini,
                 instructions= self.prompt.format(language) if self.prompt != None else SYSTEM_PROMPT.format(language),
                 input=user_post,
-                temperature=1.5,
+                temperature=1.3,
             )
             # completion = openai.ChatCompletion.create(
             #     model = self.model_name,
@@ -90,7 +90,7 @@ class LLM_Wrapper:
                 model=self.model_name_4_1_mini,
                 instructions=sys_prompt if sys_prompt else SYSTEM_PROMPT_SHORT_REPLY,
                 input=text_post,
-                temperature=1.5,
+                temperature=1.3,
             )
             return response.output_text
         except:
