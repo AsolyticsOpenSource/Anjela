@@ -581,7 +581,12 @@ class Treads_Management:
 
         if (not self.db.has_user_commented(login=self.login, tweet_url=url)) and (self.check_keywords_in_post(post_text)):
             time.sleep(11)
-            sp = self.llm.prompt if self.kt else self.surfing_sys_prompt
+            sp = None
+            if self.kt:
+                language = self.detect_language(post_text)
+                sp = self.llm.prompt.format(language)
+            else:
+                sp = self.surfing_sys_prompt
             self.like_and_reply(post=post, url=url, post_text=post_text, sys_prompt=sp)
             return True
         return False
