@@ -416,6 +416,8 @@ class Treads_Management:
 
         while True:
             # Get current elements
+            print("Searching for new content in the news feed...")
+            
             elements = self.browser.find_elements(
                 By.XPATH,
                 '//div['
