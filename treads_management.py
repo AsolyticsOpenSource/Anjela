@@ -131,10 +131,11 @@ class Treads_Management:
                 self.surfing_the_news_feed()
                 time.sleep(self.delay_between_posts)
             except Exception as e:
-                print("Error in the main loop (60 sec):", e)
+                print("Error in the main loop (60 sec):")
+                traceback.print_exc()
                 time.sleep(7)
                 self.go_to_home()
-                time.sleep(60)  # Затримка перед повторною спробою
+                time.sleep(60 * 3)  # Затримка перед повторною спробою
 
     def go_to_home(self):
         self.browser.get("https://www.threads.net")
@@ -178,25 +179,25 @@ class Treads_Management:
             'contains(@class, "x1i10hfl") and '
             'contains(@class, "xjbqb8w") and '
             'contains(@class, "x1ejq31n") and '
-            'contains(@class, "xd10rxx") and '
+            'contains(@class, "x18oe1m7") and '
             'contains(@class, "x1sy0etr") and '
-            'contains(@class, "x17r0tee") and '
+            'contains(@class, "xstzfhl") and '
             'contains(@class, "x972fbf") and '
-            'contains(@class, "xcfux6l") and '
+            'contains(@class, "x10w94by") and '
             'contains(@class, "x1qhh985") and '
-            'contains(@class, "xm0m39n") and '
+            'contains(@class, "x14e42zd") and '
             'contains(@class, "x9f619") and '
             'contains(@class, "x1ypdohk") and '
             'contains(@class, "xt0psk2") and '
             'contains(@class, "xe8uvvx") and '
             'contains(@class, "xdj266r") and '
-            'contains(@class, "x11i5rnm") and '
+            'contains(@class, "x14z9mp") and '
             'contains(@class, "xat24cr") and '
-            'contains(@class, "x1mh8g0r") and '
+            'contains(@class, "x1lziwak") and '
             'contains(@class, "xexx8yu") and '
-            'contains(@class, "x4uap5") and '
+            'contains(@class, "xyri2b") and '
             'contains(@class, "x18d9i69") and '
-            'contains(@class, "xkhd6sd") and '
+            'contains(@class, "x1c1uobl") and '
             'contains(@class, "x16tdsg8") and '
             'contains(@class, "x1hl2dhg") and '
             'contains(@class, "xggy1nq") and '
@@ -302,17 +303,19 @@ class Treads_Management:
             print("Виникла помилка під час очікування публікації\n\n")
 
     def view_the_post(self) -> bool:
-        #x1ypdohk x1n2onr6 xvuun6i x3qs2gp x1w8tkb5 x8xoigl xz9dl7a
+        #x1ypdohk x1n2onr6 xvuun6i x3qs2gp x1w8tkb5 x8xoigl xz9dl7a - застрілий 
+        #x1ypdohk x1n2onr6 xwag103 xrtyd2m x1e9mfsr xnrf12o xz9dl7a xsag5q8 
         elements = self.browser.find_elements(
             By.XPATH,
             '//div['
-            'contains(@class, "x1ypdohk") and '
+            'contains(@class, "x1ypdohk") and  '
             'contains(@class, "x1n2onr6") and '
-            'contains(@class, "xvuun6i") and '
-            'contains(@class, "x3qs2gp") and '
-            'contains(@class, "x1w8tkb5") and '
-            'contains(@class, "x8xoigl") and '
-            'contains(@class, "xz9dl7a")'
+            'contains(@class, "xwag103") and '
+            'contains(@class, "xrtyd2m") and '
+            'contains(@class, "x1e9mfsr") and '
+            'contains(@class, "xnrf12o") and '
+            'contains(@class, "xz9dl7a") and '
+            'contains(@class, "xsag5q8")'
             ']'
         )
         #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
@@ -421,13 +424,14 @@ class Treads_Management:
             elements = self.browser.find_elements(
                 By.XPATH,
                 '//div['
-                'contains(@class, "x1ypdohk") and '
+                'contains(@class, "x1ypdohk") and  '
                 'contains(@class, "x1n2onr6") and '
-                'contains(@class, "xvuun6i") and '
-                'contains(@class, "x3qs2gp") and '
-                'contains(@class, "x1w8tkb5") and '
-                'contains(@class, "x8xoigl") and '
-                'contains(@class, "xz9dl7a")'
+                'contains(@class, "xwag103") and '
+                'contains(@class, "xrtyd2m") and '
+                'contains(@class, "x1e9mfsr") and '
+                'contains(@class, "xnrf12o") and '
+                'contains(@class, "xz9dl7a") and '
+                'contains(@class, "xsag5q8")'
                 ']'
             )
 
