@@ -127,6 +127,7 @@ class Treads_Management:
                     self.publish_post_to_the_main_page()
                 except:
                     print("Home page not found, unpredictable behavior account.")
+                    self.go_to_home()
                 self.surfing_the_news_feed()
                 time.sleep(self.delay_between_posts)
             except Exception as e:
