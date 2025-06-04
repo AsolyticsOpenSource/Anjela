@@ -19,7 +19,7 @@ import sys
 
 class Treads_Management:
 
-    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str | None, surfing:str, surfing_sys_prompt:str, surfing_count:int, feed_keywords:list[str], kt, custom_keywords:list[str]):
+    def __init__(self, login:str, password:str, api_key:str, num:int, delay:int, prompt:str, freq:float, topic:str | None, subject:str, surfing:str, surfing_sys_prompt:str, surfing_count:int, feed_keywords:list[str], kt, custom_keywords:list[str]):
         self.login = login
         self.password = password
         self.cookies_file = f"cookies/{login}_cookies.json"  # Файл для збереження cookie
@@ -35,6 +35,7 @@ class Treads_Management:
         self.db = Tweets_DataBase()
         self.freq = freq
         self.topic = topic
+        self.subject = subject
         self.surfing_login = surfing
         self.surfing_sys_prompt = surfing_sys_prompt
         self.surfing_count = surfing_count
@@ -209,6 +210,12 @@ class Treads_Management:
     def publish_post(self, post:WebElement, text_post:str, url:str) -> bool:
 
         if (not self.db.contains_tweet(url)) and (not url.__contains__(f"/@{self.login}/")):
+
+            
+            if self.subject != None and not self.llm.determine_relevance_of_tweet(post_text=text_post, subject=self.subject):
+                print(f"Post not relevant to the subject, skipping")
+                return False
+
             try:
                 button_reply = post.find_element(By.CSS_SELECTOR, 'svg[aria-label="Reply"]')
                 button_reply.click()

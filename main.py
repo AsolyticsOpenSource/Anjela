@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--login', dest='login', type=str, help='Логін аккаунту соціальної мережі')
 parser.add_argument('--pwd', dest='pwd', type=str, help='Імя текстового файлу з паролем')
 parser.add_argument('--api', dest='api', type=str, help='Імя текстового файлу з токеном OpenAI')
+parser.add_argument('--subject', dest='subject', type=str, help='Шлях до файлу з темою для перевірки релевантності твітів')
 parser.add_argument('--num', dest='num', type=str, help='Кількість постів в серії (за заповчуванням 7)')
 parser.add_argument('--delay', dest='delay', type=str, help='Затримка між серією постів в хвилинах (за заповчуванням 21 хвилина)')
 parser.add_argument('--prompt', dest='prompt', type=str, help='Файл з конфігурацією для генерації постів, якщо не вказано, то буде використано за замовчуванням')
@@ -105,6 +106,19 @@ def get_topic() -> str:
         print(f"Помилка при зчитуванні файлу з темою: {e}")
     return None
 
+def get_subject() -> str:
+    try:
+        if args.subject:
+            with open(args.subject, 'r', encoding='utf-8') as file:
+                subject = file.read().strip()
+                return subject
+        return None
+    except FileNotFoundError:
+        print("Файл з темою для перевірки релевантності не знайдено.")
+    except Exception as e:
+        print(f"Помилка при зчитуванні файлу з темою для перевірки релевантності: {e}")
+    return None
+
 def get_freq() -> int:
     try:
         if args.freq:
@@ -174,6 +188,7 @@ def main():
     prompt = get_system_prompt()
     freq = get_freq()
     topic = get_topic() if freq > 0 else None 
+    subject = get_subject()
     surfing = get_surfing()
     surfing_sys_prompt = get_sur_prompt()
     surfing_count = get_sur_count()
@@ -181,7 +196,7 @@ def main():
     keywords = get_keywords()
 
     if args.login and pwd and api_key:
-        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, surfing, surfing_sys_prompt, surfing_count, feed_keywords, args.kt, keywords)
+        tm = Treads_Management(args.login, pwd, api_key, num, delay, prompt, freq, topic, subject, surfing, surfing_sys_prompt, surfing_count, feed_keywords, args.kt, keywords)
         tm.start()
     else:
         print("Логін або пароль не вказані.")

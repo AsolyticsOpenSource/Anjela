@@ -76,3 +76,14 @@ SYSTEM_PROMPT_SHORT_REPLY = """Пиши короткі коментарі до �
 Вибери будь який формат відповіді, випадковим чином.
 Не пиши нічого зайвого.
 """
+
+RELEVANCE_PROMPT = """Determine if the following tweet is relevant to the subject "{}".
+        
+        Tweet:
+        {}
+
+        Instructions:
+        - Analyze the content of the tweet
+        - Check if it discusses, mentions, or relates to the subject
+        - Respond with exactly one word: "true" if relevant, "false" if not
+        """

@@ -2,7 +2,7 @@
 from openai import OpenAI
 import traceback
 from db_tweets import Tweets_DataBase
-from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, NEW_POSTS, SYSTEM_PROMPT_SHORT_REPLY
+from prompt import SYSTEM_PROMPT, LANGUAGE_PROMPT, BIO_PROMPT, TOPIC_PROMPT, SELECT_POST_PROMPT, NEW_POSTS, SYSTEM_PROMPT_SHORT_REPLY, RELEVANCE_PROMPT
 
 class LLM_Wrapper:
     def __init__(self, api_key:str, prompt:str | None = None):
@@ -96,3 +96,35 @@ class LLM_Wrapper:
         except:
             traceback.print_exc()
         return None
+    
+    def determine_relevance_of_tweet(self, post_text: str, subject: str) -> bool:
+        """
+        Determines if a tweet is relevant to the given subject using OpenAI's model.
+        
+        Args:
+            post_text: The text content of the tweet/post
+            subject: The subject to check relevance against
+            
+        Returns:
+            bool: True if relevant, False otherwise
+        """
+        
+        try:
+            response = self.client.responses.create(
+                model=self.model_name_4o_mini,
+                instructions="",
+                input=RELEVANCE_PROMPT.format(subject, post_text),
+            )
+            result = response.output_text.strip().lower()
+            
+            if result == "true":
+                return True
+            elif result == "false":
+                return False
+            else:
+                print(f"Unexpected relevance response: {result}")
+                return False
+                
+        except Exception as e:
+            traceback.print_exc()
+            return False
