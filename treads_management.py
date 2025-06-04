@@ -131,7 +131,7 @@ class Treads_Management:
                 self.surfing_the_news_feed()
                 time.sleep(self.delay_between_posts)
             except Exception as e:
-                print("Error in the main loop:", e)
+                print("Error in the main loop (60 sec):", e)
                 time.sleep(7)
                 self.go_to_home()
                 time.sleep(60)  # Затримка перед повторною спробою
