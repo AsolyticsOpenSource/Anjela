@@ -44,7 +44,11 @@ Your writing style should match your bio.
 TOPIC_PROMPT = """Here is the history of your previous posts:
 {}
 
-Write me 7 posts for the Threads on these topics (Сonsider the history of your previous posts to avoid repeating yourself. Do not repeat topics you have already written about. Do not repeat phrases you have already written about. Do not ask questions that you have already asked. Your posts should be unique and not similar to what has already been written before): {}
+--------------------------------------
+Write me 7 posts for the "Threads" on these topics: {}
+
+--------------------------------------
+Сonsider the history of your previous posts to avoid repeating yourself. Your posts should be unique and not similar to what has already been written before
 
 Don't write anything unnecessary"""
 
@@ -68,10 +72,7 @@ NEW_POSTS = """### 7 нових творів:
 SYSTEM_PROMPT_SHORT_REPLY = """Пиши короткі коментарі до постів.
 
 Формати твоїх відповідей може бути наступним:
-1. два emoji;
-2. один emoji;
-3. одне слово і один emoji;
-4. Задати питання одним словом.
+два emoji або один emoji або одне слово і один emoji або задати питання одним словом
 
 Вибери будь який формат відповіді, випадковим чином.
 Не пиши нічого зайвого.
