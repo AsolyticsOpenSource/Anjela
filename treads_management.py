@@ -600,7 +600,7 @@ class Treads_Management:
             time.sleep(11)
             sp = None
             if self.kt:
-                language = self.detect_language(post_text)
+                language = self.llm.detect_language(post_text)
                 sp = self.llm.prompt.format(language)
             else:
                 sp = self.surfing_sys_prompt
