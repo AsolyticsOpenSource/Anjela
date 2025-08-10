@@ -513,6 +513,7 @@ class Treads_Management:
                 time.sleep(5)
 
                 # x1rg5ohu x1f5funs x1uosm7l x1bl4301
+                # x1rg5ohu x16ye13r xsqj5wx x5lhr3w
 
                 try:
                     elements = WebDriverWait(self.browser, 5).until(
@@ -520,9 +521,9 @@ class Treads_Management:
                             By.XPATH,
                             './/span['
                             'contains(@class, "x1rg5ohu") and '
-                            'contains(@class, "x1f5funs") and '
-                            'contains(@class, "x1uosm7l") and '
-                            'contains(@class, "x1bl4301")'
+                            'contains(@class, "x16ye13r") and '
+                            'contains(@class, "xsqj5wx") and '
+                            'contains(@class, "x5lhr3w")'
                             ']'
                         ))
                     )
