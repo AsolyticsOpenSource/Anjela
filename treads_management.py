@@ -172,42 +172,11 @@ class Treads_Management:
             self.view_the_post()
         pass
 
+    #x1i10hfl xjbqb8w x1ejq31n x18oe1m7 x1sy0etr xstzfhl x972fbf x10w94by x1qhh985 x14e42zd x9f619 x1ypdohk xt0psk2 x3ct3a4 xdj266r x14z9mp xat24cr x1lziwak xexx8yu xyri2b x18d9i69 x1c1uobl x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz x1lku1pv x12rw4y6 xrkepyr x1citr7e x37wo2f
     def get_post_href(self, element) -> str:
         a_element = element.find_element(
             By.XPATH,
-            './/a['
-            'contains(@class, "x1i10hfl") and '
-            'contains(@class, "xjbqb8w") and '
-            'contains(@class, "x1ejq31n") and '
-            'contains(@class, "x18oe1m7") and '
-            'contains(@class, "x1sy0etr") and '
-            'contains(@class, "xstzfhl") and '
-            'contains(@class, "x972fbf") and '
-            'contains(@class, "x10w94by") and '
-            'contains(@class, "x1qhh985") and '
-            'contains(@class, "x14e42zd") and '
-            'contains(@class, "x9f619") and '
-            'contains(@class, "x1ypdohk") and '
-            'contains(@class, "xt0psk2") and '
-            'contains(@class, "xe8uvvx") and '
-            'contains(@class, "xdj266r") and '
-            'contains(@class, "x14z9mp") and '
-            'contains(@class, "xat24cr") and '
-            'contains(@class, "x1lziwak") and '
-            'contains(@class, "xexx8yu") and '
-            'contains(@class, "xyri2b") and '
-            'contains(@class, "x18d9i69") and '
-            'contains(@class, "x1c1uobl") and '
-            'contains(@class, "x16tdsg8") and '
-            'contains(@class, "x1hl2dhg") and '
-            'contains(@class, "xggy1nq") and '
-            'contains(@class, "x1a2a7pz") and '
-            'contains(@class, "x1lku1pv") and '
-            'contains(@class, "x12rw4y6") and '
-            'contains(@class, "xrkepyr") and '
-            'contains(@class, "x1citr7e") and '
-            'contains(@class, "x37wo2f")'
-            ']'
+            './/a[contains(@class, "x1i10hfl") and contains(@class, "xjbqb8w") and contains(@class, "x1ejq31n") and contains(@class, "x18oe1m7") and contains(@class, "x1sy0etr") and contains(@class, "xstzfhl") and contains(@class, "x972fbf") and contains(@class, "x10w94by") and contains(@class, "x1qhh985") and contains(@class, "x14e42zd") and contains(@class, "x9f619") and contains(@class, "x1ypdohk") and contains(@class, "xt0psk2") and contains(@class, "x3ct3a4") and contains(@class, "xdj266r") and contains(@class, "x14z9mp") and contains(@class, "xat24cr") and contains(@class, "x1lziwak") and contains(@class, "xexx8yu") and contains(@class, "xyri2b") and contains(@class, "x18d9i69") and contains(@class, "x1c1uobl") and contains(@class, "x16tdsg8") and contains(@class, "x1hl2dhg") and contains(@class, "xggy1nq") and contains(@class, "x1a2a7pz") and contains(@class, "x1lku1pv") and contains(@class, "x12rw4y6") and contains(@class, "xrkepyr") and contains(@class, "x1citr7e") and contains(@class, "x37wo2f")]'
         )
         post_href = a_element.get_attribute("href")
         return post_href
@@ -255,17 +224,17 @@ class Treads_Management:
                     time.sleep(3)
 
                     btns = WebDriverWait(self.browser, 5).until(
+                            
                             EC.presence_of_all_elements_located((
                                 By.XPATH,
                                 './/span['
                                 'contains(@class, "x1rg5ohu") and '
-                                'contains(@class, "x1f5funs") and '
-                                'contains(@class, "x1uosm7l") and '
-                                'contains(@class, "x1bl4301")'
+                                'contains(@class, "x16ye13r") and '
+                                'contains(@class, "xsqj5wx") and '
+                                'contains(@class, "x5lhr3w")'
                                 ']'
                             ))
                         )
-
                     if len(btns) > 1:
                         btns[-1].click()
                         self.wait_for_publication()
@@ -305,19 +274,24 @@ class Treads_Management:
     def view_the_post(self) -> bool:
         #x1ypdohk x1n2onr6 xvuun6i x3qs2gp x1w8tkb5 x8xoigl xz9dl7a - застрілий 
         #x1ypdohk x1n2onr6 xwag103 xrtyd2m x1e9mfsr xnrf12o xz9dl7a xsag5q8 
+        # x1ypdohk x1n2onr6 x1f9n5g x17dsfyh   xzzag5r x1losyl9   xz9dl7a x6bh95i x13fuv20 xt8cgyo xsag5q8
         elements = self.browser.find_elements(
             By.XPATH,
             '//div['
             'contains(@class, "x1ypdohk") and  '
             'contains(@class, "x1n2onr6") and '
-            'contains(@class, "xwag103") and '
-            'contains(@class, "xrtyd2m") and '
-            'contains(@class, "x1e9mfsr") and '
-            'contains(@class, "xnrf12o") and '
+            'contains(@class, "x1f9n5g") and '
+            'contains(@class, "x17dsfyh") and '
+            'contains(@class, "xzzag5r") and '
+            'contains(@class, "x1losyl9") and '
             'contains(@class, "xz9dl7a") and '
+            'contains(@class, "x6bh95i") and '
+            'contains(@class, "x13fuv20") and '
+            'contains(@class, "xt8cgyo") and '
             'contains(@class, "xsag5q8")'
             ']'
         )
+        print(f"Number of elements found: {len(elements)}")
         #Лінія: x1vf43f7 xm3z3ea x1x8b98j x131883w x16mih1h x5yr21d x10l6tqk xfo62xy
         number_of_published_comments = 0
         for element in elements:
@@ -426,11 +400,14 @@ class Treads_Management:
                 '//div['
                 'contains(@class, "x1ypdohk") and  '
                 'contains(@class, "x1n2onr6") and '
-                'contains(@class, "xwag103") and '
-                'contains(@class, "xrtyd2m") and '
-                'contains(@class, "x1e9mfsr") and '
-                'contains(@class, "xnrf12o") and '
+                'contains(@class, "x1f9n5g") and '
+                'contains(@class, "x17dsfyh") and '
+                'contains(@class, "xzzag5r") and '
+                'contains(@class, "x1losyl9") and '
                 'contains(@class, "xz9dl7a") and '
+                'contains(@class, "x6bh95i") and '
+                'contains(@class, "x13fuv20") and '
+                'contains(@class, "xt8cgyo") and '
                 'contains(@class, "xsag5q8")'
                 ']'
             )
